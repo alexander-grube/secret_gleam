@@ -1,5 +1,8 @@
 import dot_env
 import dot_env/env
+import gleam/pgo
+import gleam/option
+import gleam/dynamic
 import gleam/io
 
 pub fn main() {
@@ -11,6 +14,47 @@ pub fn main() {
     Ok(value) -> io.println(value)
     Error(_) -> io.println("something went wrong")
   }
+
+  let db_host = case env.get("DB_HOST") {
+    Ok(value) -> value
+    Error(_) -> "localhost"
+  }
+
+  let db_user = case env.get("DB_USER") {
+    Ok(value) -> value
+    Error(_) -> "root"
+  }
+
+  let db_pass = option.from_result(env.get("DB_PASS"))
+
+  let db_name = case env.get("DB_NAME") {
+    Ok(value) -> value
+    Error(_) -> "my_database"
+  }
+
+  let db =
+    pgo.connect(
+      pgo.Config(
+        ..pgo.default_config(),
+        user: db_user,
+        password: db_pass,
+        host: db_host,
+        database: db_name,
+        pool_size: 15,
+      ),
+    )
+
+  let sql =
+    "
+  select
+    message
+  from
+    secret_message
+    "
+
+  let result_type = dynamic.string
+
+  let assert Ok(response) = pgo.execute(sql, db, [], result_type)
 
   Nil
 }
