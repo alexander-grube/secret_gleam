@@ -1,9 +1,11 @@
 import dot_env
 import dot_env/env
-import gleam/pgo
-import gleam/option
 import gleam/dynamic
+import gleam/int
 import gleam/io
+import gleam/list
+import gleam/option
+import gleam/pgo
 
 pub fn main() {
   io.println("Hello from secret_gleam!")
@@ -52,9 +54,17 @@ pub fn main() {
     secret_message
     "
 
-  let result_type = dynamic.string
+  let assert Ok(response) = pgo.execute(sql, db, [], dynamic.string)
 
-  let assert Ok(response) = pgo.execute(sql, db, [], result_type)
+  response.count
+  |> int.to_string
+  |> io.println
+
+  response.rows
+  |> list.each(fn(row) {
+    row
+    |> io.println
+  })
 
   Nil
 }
