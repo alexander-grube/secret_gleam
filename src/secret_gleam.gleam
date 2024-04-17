@@ -1,7 +1,6 @@
 import dot_env
 import dot_env/env
 import gleam/dynamic
-import gleam/int
 import gleam/io
 import gleam/list
 import gleam/option
@@ -58,13 +57,12 @@ pub fn main() {
     pgo.execute(sql, db, [], dynamic.element(0, dynamic.string))
 
   response.count
-  |> int.to_string
-  |> io.println
+  |> io.debug
 
   response.rows
   |> list.map(fn(row) {
     row
-    |> io.println
+    |> io.debug
   })
 
   Nil
