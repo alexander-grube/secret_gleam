@@ -54,14 +54,15 @@ pub fn main() {
     secret_message
     "
 
-  let assert Ok(response) = pgo.execute(sql, db, [], dynamic.string)
+  let assert Ok(response) =
+    pgo.execute(sql, db, [], dynamic.element(0, dynamic.string))
 
   response.count
   |> int.to_string
   |> io.println
 
   response.rows
-  |> list.each(fn(row) {
+  |> list.map(fn(row) {
     row
     |> io.println
   })
