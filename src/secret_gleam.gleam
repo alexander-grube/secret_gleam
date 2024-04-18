@@ -1,10 +1,25 @@
 import dot_env
 import dot_env/env
+import gleam/bytes_builder
 import gleam/dynamic
+import gleam/http/elli
+import gleam/http/request
+import gleam/http/response
+import gleam/int
 import gleam/io
+import gleam/json.{object, string}
 import gleam/list
 import gleam/option
 import gleam/pgo
+
+pub type Message {
+  Message(message: String)
+}
+
+pub fn message_to_json(message: Message) -> String {
+  object([#("message", string(message.message))])
+  |> json.to_string
+}
 
 pub fn main() {
   io.println("Hello from secret_gleam!")
@@ -14,6 +29,16 @@ pub fn main() {
   case env.get("TESTVAR") {
     Ok(value) -> io.println(value)
     Error(_) -> io.println("something went wrong")
+  }
+
+  let port = case env.get("PORT") {
+    Ok(value) -> {
+      case int.base_parse(value, 10) {
+        Ok(value) -> value
+        Error(_) -> 3000
+      }
+    }
+    Error(_) -> 3000
   }
 
   let db_host = case env.get("DB_HOST") {
@@ -65,5 +90,23 @@ pub fn main() {
     |> io.debug
   })
 
+  let _ = elli.become(my_service, on_port: port)
+
   Nil
+}
+
+// Define a HTTP service
+//
+pub fn my_service(
+  _req: request.Request(t),
+) -> response.Response(bytes_builder.BytesBuilder) {
+  let body =
+    Message("Hello from secret_gleam!")
+    |> message_to_json
+    |> bytes_builder.from_string
+
+  response.new(200)
+  |> response.prepend_header("made-with", "Gleam")
+  |> response.prepend_header("content-type", "application/json")
+  |> response.set_body(body)
 }
