@@ -2,6 +2,7 @@ import dot_env
 import dot_env/env
 import gleam/bytes_builder
 import gleam/dynamic
+import gleam/erlang/process
 import gleam/http/elli
 import gleam/http/request
 import gleam/http/response
@@ -11,6 +12,8 @@ import gleam/json.{object, string}
 import gleam/list
 import gleam/option
 import gleam/pgo
+import gleam/string
+import secret_message/web
 
 pub type Message {
   Message(message: String)
@@ -90,7 +93,16 @@ pub fn main() {
     |> io.debug
   })
 
-  let _ = elli.become(my_service, on_port: port)
+  let assert Ok(_) =
+    web.stack()
+    |> elli.start(on_port: port)
+
+  ["Started listening on localhost:", int.to_string(port), " ✨"]
+  |> string.concat
+  |> io.println
+
+  // Put the main process to sleep while the web server does its thing
+  process.sleep_forever()
 
   Nil
 }

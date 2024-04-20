@@ -25,8 +25,9 @@ packages = [
 [requirements]
 dot_env = { version = "~> 0.5" }
 gleam_elli = { version = ">= 2.4.0 and < 3.0.0" }
+gleam_erlang = { version = ">= 0.25.0 and < 1.0.0"}
 gleam_http = { version = ">= 3.6.0 and < 4.0.0" }
-gleam_json = { version = ">= 1.0.0 and < 2.0.0"}
+gleam_json = { version = ">= 1.0.0 and < 2.0.0" }
 gleam_pgo = { version = "~> 0.7" }
 gleam_stdlib = { version = "~> 0.34 or ~> 1.0" }
 gleeunit = { version = "~> 1.0" }
